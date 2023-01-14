@@ -18,7 +18,7 @@ let messages = [
 ];
 
 io.on("connection", (socket) => {
-  console.log("A user connected");
+  // console.log("A user connected");
   //
   // send initial messages from server :
   socket.emit("MessagesFromServer", messages);
@@ -34,6 +34,6 @@ io.on("connection", (socket) => {
   //
   //
   socket.on("disconnect", () => {
-    console.log("A user disconnected");
+    // console.log("A user disconnected");
   });
 });
