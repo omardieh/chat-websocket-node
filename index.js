@@ -1,9 +1,38 @@
 require("dotenv").config();
 const socketIO = require("socket.io");
+const path = require("path");
+const express = require("express");
+const app = express();
+
 const { SERVER_PORT, CLIENT_PORT } = process.env;
 
-const app = require("express")();
-const server = app.listen(SERVER_PORT);
+const server = app.listen(SERVER_PORT, (e) => {
+  if (e) {
+    throw new Error(e);
+  } else {
+    console.log("running on server " + SERVER_PORT);
+  }
+});
+
+// express.static(path.join(__dirname, "../chat-websocket-react/build"));
+
+app.use((req, res, next) => {
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  next();
+});
+
+// app.get("*", (req, res) => {
+//   res.sendFile(
+//     path.join(__dirname, "../chat-websocket-react/build", "index.html")
+//   );
+//   res.end();
+// });
+
+app.get("/api", (req, res) => {
+  res.send("api test");
+});
+
+app.use(express.static("public"));
 
 const io = socketIO(server, {
   cors: { origin: [`http://localhost:${CLIENT_PORT}`] },
@@ -18,22 +47,10 @@ let messages = [
 ];
 
 io.on("connection", (socket) => {
-  // console.log("A user connected");
-  //
-  // send initial messages from server :
   socket.emit("MessagesFromServer", messages);
-  //
-  // receive message from client :
   socket.on("MessageToServer", (message) => {
     messages.push(message);
-    //
-    // send message back to client :
     io.emit("MessageToClient", message);
   });
-
-  //
-  //
-  socket.on("disconnect", () => {
-    // console.log("A user disconnected");
-  });
+  socket.on("disconnect", () => {});
 });
