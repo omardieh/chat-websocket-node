@@ -9,30 +9,20 @@ const { SERVER_PORT, CLIENT_PORT } = process.env;
 const server = app.listen(SERVER_PORT, (e) => {
   if (e) {
     throw new Error(e);
-  } else {
-    console.log("running on server " + SERVER_PORT);
   }
 });
-
-// express.static(path.join(__dirname, "../chat-websocket-react/build"));
 
 app.use((req, res, next) => {
   res.setHeader("X-Content-Type-Options", "nosniff");
   next();
 });
 
-// app.get("*", (req, res) => {
-//   res.sendFile(
-//     path.join(__dirname, "../chat-websocket-react/build", "index.html")
-//   );
-//   res.end();
-// });
-
 app.get("/api", (req, res) => {
   res.send("api test");
 });
 
 app.use(express.static("public"));
+app.use("*", express.static("public"));
 
 const io = socketIO(server, {
   cors: { origin: [`http://localhost:${CLIENT_PORT}`] },
