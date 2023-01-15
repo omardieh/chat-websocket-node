@@ -1,6 +1,5 @@
 require("dotenv").config();
 const socketIO = require("socket.io");
-const path = require("path");
 const express = require("express");
 const app = express();
 
@@ -28,9 +27,15 @@ const io = socketIO(server, {
   cors: { origin: [`http://localhost:${CLIENT_PORT}`] },
 });
 
+const timeDateNow = new Date()
+  .toLocaleString()
+  .replace(",", "")
+  .replace(/:.. /, " ");
+
 let messages = [
   {
-    author: "server",
+    author: "Server",
+    date: timeDateNow,
     message:
       "welcome to the webSocket chat app! mad with Node, React and socket.io",
   },
@@ -39,8 +44,8 @@ let messages = [
 io.on("connection", (socket) => {
   socket.emit("MessagesFromServer", messages);
   socket.on("MessageToServer", (message) => {
-    messages.push(message);
-    io.emit("MessageToClient", message);
+    messages.push({ ...message, date: timeDateNow });
+    io.emit("MessageToClient", { ...message, date: timeDateNow });
   });
   socket.on("disconnect", () => {});
 });
